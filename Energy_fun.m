@@ -25,38 +25,48 @@ if flag==1 %  when health state called
             Node(node_tag(i)).status=0;
         end
     end
-else % Normal state
-    for i=1:n %for all live node
-        if (Node(node_tag(i)).energy<=E_die) % condition for dead node
-            Node(node_tag(i)).status=0;
-            continue;
-        end
-        % checking for Role conversion
-%         if ((Node(node_tag(i)).energy<=E_threshold) && (Node(node_tag(i)).role~='S'))
-%             Node(node_tag(i)).role='S';
+% else % Normal state
+%     for i=1:n %for all live node
+%         if (Node(node_tag(i)).energy<=E_die) % condition for dead node
+%             Node(node_tag(i)).status=0;
+%             continue;
 %         end
-        if Node(node_tag(i)).role=='S'% for sensors
-            Node(node_tag(i)).energy = Node(node_tag(i)).energy-S_fxd ;
-            if (Node(node_tag(i)).energy<=E_die) % condition for dead node
-                Node(node_tag(i)).status=0;
-            end
-        elseif Node(node_tag(i)).role=='R'%for relays
-            Node(node_tag(i)).energy = Node(node_tag(i)).energy-R_fxd ;
-            if (Node(node_tag(i)).energy<=E_die) % condition for dead node
-                Node(node_tag(i)).status=0;
-            end
-        elseif Node(node_tag(i)).role=='E'%for emergency
-            Node(node_tag(i)).energy = Node(node_tag(i)).energy-E_fxd;
-            if (Node(node_tag(i)).energy<=E_die) % condition for dead node
-                Node(node_tag(i)).status=0;
-            end
-        elseif Node(node_tag(i)).role=='B'%for both
-            Node(node_tag(i)).energy = Node(node_tag(i)).energy-S_fxd-R_fxd;
+%         % checking for Role conversion
+% %         if ((Node(node_tag(i)).energy<=E_threshold) && (Node(node_tag(i)).role~='S'))
+% %             Node(node_tag(i)).role='S';
+% %         end
+%         if Node(node_tag(i)).role=='S'% for sensors
+%             Node(node_tag(i)).energy = Node(node_tag(i)).energy-S_fxd ;
+%             if (Node(node_tag(i)).energy<=E_die) % condition for dead node
+%                 Node(node_tag(i)).status=0;
+%             end
+%         elseif Node(node_tag(i)).role=='R'%for relays
+%             Node(node_tag(i)).energy = Node(node_tag(i)).energy-R_fxd ;
+%             if (Node(node_tag(i)).energy<=E_die) % condition for dead node
+%                 Node(node_tag(i)).status=0;
+%             end
+%         elseif Node(node_tag(i)).role=='E'%for emergency
+%             Node(node_tag(i)).energy = Node(node_tag(i)).energy-E_fxd;
+%             if (Node(node_tag(i)).energy<=E_die) % condition for dead node
+%                 Node(node_tag(i)).status=0;
+%             end
+%         elseif Node(node_tag(i)).role=='B'%for both
+%             Node(node_tag(i)).energy = Node(node_tag(i)).energy-S_fxd-R_fxd;
+%             if (Node(node_tag(i)).energy<=E_die) % condition for dead node
+%                 Node(node_tag(i)).status=0;
+%             end
+%         end
+%     end
+% end
+else
+    for i = 1:n
+        if (Node(node_tag(i)).energy<=E_die) % condition for dead node
+             Node(node_tag(i)).status=0;
+        else
+             Node(node_tag(i)).energy = Node(node_tag(i)).energy-S_fxd-R_fxd;
             if (Node(node_tag(i)).energy<=E_die) % condition for dead node
                 Node(node_tag(i)).status=0;
             end
         end
     end
-end
-
 end
