@@ -19,7 +19,7 @@ E_threshold = 2.5; % Minimum energy after which node cann't be relay(volts)
 E_die = 1.8; % Energy after which node cannnot work(volts).
 Status = [1;0]; % live and dead.%Status = ['L';'D'];
 Role = ['S';'R';'B';'E']; % sensor or relay or both and emergency
-Length_interest = 150; %deployment lenght of galary
+Length_interest = 350; %deployment lenght of galary
 Start_length = 100;
 global Rcom
 Rcom = 40; % communication range of sensor
@@ -34,7 +34,7 @@ Pos = {'wall_1','wall_2'};
 Exist = [1;0];
 Mode = [1,2]; % Active->1  Sleep->2
 global Node
-Node = struct('tag',tag,'energy',E_max,'neighbor',[],'status',Status(2),'role',Role(1),'loc',[],'pos',[],'exist',Exist(2),'mode',Mode(1));
+Node = struct('tag',tag,'energy',E_max,'neighbor',[],'status',Status(2),'role',Role(1),'loc',[],'pos',[],'exist',Exist(2),'mode',Mode(1), 'lvl', -1);
 Sink_neighbor =[];
 %% DEPLOY and obtain deployment parameters as output
 
@@ -166,6 +166,7 @@ Drole_d={}; %role->dead;
 % sleeping condition not added
 rng('shuffle');
 flag=0;
+prt = [];
 for l=1:iteration
     check = 0;
     m_in = 0;
@@ -356,7 +357,7 @@ for l=1:iteration
                 [Node(live).role]= temp_r{:};
             end
         else
-            %  storing optimal cover and cost of all cover in total cover
+             %storing optimal cover and cost of all cover in total cover
             cov_val{end+1} = opt_cover;
             cov_ind = [cov_ind index];
             par_val{end+1} = parameter;
@@ -373,15 +374,15 @@ for l=1:iteration
                 [Node(s).role]= temp_r{:};
             end
         end
-        %         % not calculating parameter here because loop_count is multiple of
-        %         % data_count.
-        % flag =1; %resettig the flag after periodic check is done
-        %     end
-        %
-        %     if (check==0 || flag==0) && mod(l,data_count)==0
-        % parameter calculate periodically
-        %         live = find([Node(:).status]&[Node(:).exist]==1);
-        %         dead = find(((~[Node(:).status])&[Node(:).exist])==1);
+                % not calculating parameter here because loop_count is multiple of
+                % data_count.
+        flag =1; %resettig the flag after periodic check is done
+            end
+        
+            if (check==0 || flag==0) && mod(l,data_count)==0
+        %parameter calculate periodically
+                live = find([Node(:).status]&[Node(:).exist]==1);
+                dead = find(((~[Node(:).status])&[Node(:).exist])==1);
         par_it= [par_it l];% store iteration number when parameters evaluated
         % storing tag,energy,role of live and dead nodes
         tag_l{end+1} = [Node(live).tag];
@@ -397,7 +398,7 @@ for l=1:iteration
         end
         
     end
-    prt = size(num_live, 2)
+    prt = [prt;l size(live, 2)];
 end
 
 %emergency = unique(emergency);
