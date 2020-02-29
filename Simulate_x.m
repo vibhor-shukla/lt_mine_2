@@ -50,15 +50,20 @@ k=1; % Deployed node access loop variable
 while sides<=Total_dep_side
     % Assigning location coordinates and position of all node to respective
     % values.
+    cnt = 1;
     for i=1:each_side(sides)      %1:size(X{sides},2)
         Node(k).loc = [X{sides}(i),Y{sides}(i),Z{sides}(i)];
         Node(k).pos = Pos{sides};
         % tagging is for W1,r,W2 subsequently in order for k.
         Node(k).exist = Exist(1);
+        Node(k).lvl = cnt;
+        cnt = cnt + 1;
         k=k+1;
     end
     sides = sides+1;
 end
+
+each_count = each_side(1);
 
 % finding neighbors for each node. Exclude those on same side
 for i=1:number_node
@@ -181,7 +186,7 @@ for l=1:iteration
 %      end
     
     %% Node level
-    Energy_fun(0); % normal energy depletion
+    Energy_fun(0, each_count); % normal energy depletion
     
 
     %Normal Destroy
@@ -344,7 +349,7 @@ for l=1:iteration
    % periodic only when any relay was dead earlier and no update due to addition
     num_live = find([Node(:).status]&[Node(:).exist]==1);
     if (l==1)||mod(l,data_count)==0 % && (check==0 || flag==0) %&& mod(l,loop_count)==0
-        Energy_fun(1); % for health check state
+        Energy_fun(1, each_count); % for health check state
         live = find([Node(:).status]&[Node(:).exist]==1);
         dead = find(((~[Node(:).status])&[Node(:).exist])==1);
         %         [Total_cover,load] = cover(live);
