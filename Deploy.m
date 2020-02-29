@@ -16,7 +16,13 @@ x_int = 0.45 * Rcom;
 
 X_w1 = 0:2 * x_int:length_interest;
 X_r = X_w1(1)+(2 * x_int / 3):2 * x_int:length_interest-x_int/2;
-X_w2 = x_int:2 * x_int:length_interest;
+X_w2 = X_r(1) + (2 * x_int / 3):2 * x_int:length_interest;
+
+X_w21 = X_w2;
+X_w22 = X_w2;
+
+X_w11 = X_w1;
+X_w12 = X_w1;
 
 s1 = size(X_w1, 2);
 s2 = size(X_r, 2);
@@ -37,16 +43,35 @@ while(size(X_w2, 2) > siz)
     X_w2(end) = [];
 end
 
+% s1
+% s2
+% s3
+% length_interest
 size(X_w1, 2) + size(X_r, 2) + size(X_w2, 2)
 %size(X_w1, 2) + size(X_w2, 2)
+
+% prompt_del = 'Enter the file name to store data: ';
+% file_del = input(prompt_del,'s');
 
 Y_w1 = zeros([1 size(X_w1,2)]);
 Y_r = (Width/2).*ones([1 size(X_r,2)]);
 Y_w2 = Y_w1 + Width;
 
+Y_w21 = Y_w2 + 20;
+Y_w22 = Y_w21 + 20;
+
+Y_w11 = Y_w1 - 20;
+Y_w12 = Y_w11 - 20;
+
 Z_w1 = (Height).*ones([1 size(X_w1,2)]);
 Z_r = Height.*ones([1 size(X_r,2)]);
 Z_w2 = (Height).*ones([1 size(X_w2,2)]);
+
+Z_w11 = Z_w1;
+Z_w12 = Z_w1;
+
+Z_w21 = Z_w2;
+Z_w22 = Z_w2;
 
 % for i = 1:size(X_w1, 2)
 %     x = mod(i - 1, 3);
@@ -106,7 +131,7 @@ for i = 1:n_w1
     % betweem wall 1 and wall 2.
     for j= 1:n_w2
         if dist([X_w1(i) X_w2(j)],[Y_w1(i) Y_w2(j)],[Z_w1(i) Z_w2(j)])<=Rcom
-             plot3([X_w1(i) X_w2(j)],[Y_w1(i) Y_w2(j)],[Z_w1(i) Z_w2(j)],'b');
+%              plot3([X_w1(i) X_w2(j)],[Y_w1(i) Y_w2(j)],[Z_w1(i) Z_w2(j)],'b');
              % updating degree count of nodes.
              deg_w1(i)=deg_w1(i)+1;
              deg_w2(j)=deg_w2(j)+1;
@@ -115,7 +140,7 @@ for i = 1:n_w1
     %Between wall 1 and roof
     for j= 1:n_r
         if dist([X_w1(i) X_r(j)],[Y_w1(i) Y_r(j)],[Z_w1(i) Z_r(j)])<=Rcom
-             plot3([X_w1(i) X_r(j)],[Y_w1(i) Y_r(j)],[Z_w1(i) Z_r(j)],'r');
+%               plot3([X_w1(i) X_r(j)],[Y_w1(i) Y_r(j)],[Z_w1(i) Z_r(j)],'r');
              % updating degree count of nodes.
              deg_w1(i)=deg_w1(i)+1;
              deg_r(j)=deg_r(j)+1;
@@ -127,7 +152,7 @@ end
 for i= 1:n_w2
     for j= 1:n_r
         if dist([X_w2(i) X_r(j)],[Y_w2(i) Y_r(j)],[Z_w2(i) Z_r(j)])<=Rcom
-             plot3([X_w2(i) X_r(j)],[Y_w2(i) Y_r(j)],[Z_w2(i) Z_r(j)],'r');
+%               plot3([X_w2(i) X_r(j)],[Y_w2(i) Y_r(j)],[Z_w2(i) Z_r(j)],'r');
              % updating degree count of nodes.
              deg_w2(i)=deg_w2(i)+1;
              deg_r(j)=deg_r(j)+1;
@@ -135,9 +160,26 @@ for i= 1:n_w2
     end
 end
 
- xlim([0 length_interest]);
- ylim([0 Width]);
- zlim([0 Height]);
+for i = 1:n_w1 - 1
+    plot3([X_w1(i) X_w1(i + 1)],[Y_w1(i) Y_w1(i + 1)], [Z_w1(i) Z_w1(i + 1)], 'b');
+    plot3([X_w1(i) X_r(i)],[Y_w1(i) Y_r(i)], [Z_w1(i) Z_r(i)], 'b');
+    plot3([X_w1(i) X_w11(i)],[Y_w1(i) Y_w11(i)], [Z_w1(i) Z_w11(i)], 'b');
+    plot3([X_w11(i) X_w12(i)],[Y_w11(i) Y_w12(i)], [Z_w11(i) Z_w12(i)], 'b');
+end
+for i = 1:n_w2 - 1
+    plot3([X_w2(i) X_w2(i + 1)],[Y_w2(i) Y_w2(i + 1)], [Z_w2(i) Z_w2(i + 1)], 'b');
+    plot3([X_w2(i) X_r(i)],[Y_w2(i) Y_r(i)], [Z_w2(i) Z_r(i)], 'b');
+    plot3([X_w2(i) X_w21(i)],[Y_w2(i) Y_w21(i)], [Z_w2(i) Z_w21(i)], 'b');
+    plot3([X_w21(i) X_w22(i)],[Y_w21(i) Y_w22(i)], [Z_w21(i) Z_w22(i)], 'b');
+end
+for i = 1:n_r - 1
+    plot3([X_r(i) X_r(i + 1)],[Y_r(i) Y_r(i + 1)], [Z_r(i) Z_r(i + 1)], 'r');
+end
+
+
+xlim([0 length_interest]);
+ylim([0 Width]);
+zlim([0 Height]);
 
 % sphere around sink
 [x,y,z]=sphere(128);
