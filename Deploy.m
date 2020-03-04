@@ -125,6 +125,12 @@ scatter3(X_w1,Y_w1,Z_w1,'b');
 hold on;
 scatter3(X_w2,Y_w2,Z_w2,'b');
 scatter3(X_r,Y_r,Z_r,'b');
+
+scatter3(X_w11,Y_w11,Z_w11,'g', 'filled');
+scatter3(X_w12,Y_w12,Z_w12,'g', 'filled');
+scatter3(X_w21,Y_w21,Z_w21,'g', 'filled');
+scatter3(X_w22,Y_w22,Z_w22,'g', 'filled');
+
 scatter3(X_s,Y_s,Z_s,'black','s','fill');
 
 for i = 1:n_w1

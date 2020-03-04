@@ -69,7 +69,7 @@ each_count = each_side(1);
 for i=1:number_node
     for j= 1:number_node
         d=dist([Node(i).loc(1) Node(j).loc(1)],[Node(i).loc(2) Node(j).loc(2)],[Node(i).loc(3) Node(j).loc(3)]);
-         if d<=Rcom&&Node(j).exist&&mode_c %mode=1
+         if ~(j == i) && d<=Rcom&&Node(j).exist&&mode_c %mode=1
              Node(i).neighbor = [Node(i).neighbor, Node(j).tag];
          elseif d<=Rcom&&Node(j).exist&&~strcmp(Node(i).pos,Node(j).pos) %mode=0
             Node(i).neighbor = [Node(i).neighbor, Node(j).tag];
@@ -90,7 +90,7 @@ end
 % Node tag is also node access index
 [Graph_node] = find([Node(:).status]&[Node(:).exist]==1); % taking graph node/deployed
 % [Total_Cover,Load] = cover(Graph_node);
-[Total_Cover,Load] = cover(Graph_node,Sink_neighbor,mode_c); %cell array of all possible covers
+[Total_Cover,Load] = cover(0, Graph_node,Sink_neighbor,mode_c); %cell array of all possible covers
 % Finding minimum cover size and its index in cell of all covers.
 %%[min,index] = min(cellfun('size',Total_cover,2));
 [Opt_cover,Index,Parameter] = Optimal_cov(Total_Cover,Load,mode_c);
@@ -98,11 +98,16 @@ end
 % opt_cover-> optimal cover and its access index in Total_cover.
 
 %% Simulation Parameters
-
 temp(1:max_node) = {0};
 [Node.exist] = temp{:};% reassigning value for simulation
 [Node.status] = temp{:};% reassigning value for simulation
-Addition(Length_interest,0,Start_length); %initializing deployment
+%Addition(Length_interest,0,Start_length); %initializing deployment
+Addition(Length_interest,0,Length_interest); %initializing deployment
+
+size(find([Node(:).status]&[Node(:).exist]==1), 2)
+del = find([Node(:).status])
+
+
 
 iteration = 2500;
 prob_d = 0.02; % probability for random destroy
@@ -353,7 +358,7 @@ for l=1:iteration
         live = find([Node(:).status]&[Node(:).exist]==1);
         dead = find(((~[Node(:).status])&[Node(:).exist])==1);
         %         [Total_cover,load] = cover(live);
-        [Total_cover,load] = cover(live,Sink_neighbor,mode_c); %change Optimal_cov if this step is not used.
+        [Total_cover,load] = cover(l, live,Sink_neighbor,mode_c); %change Optimal_cov if this step is not used.
         [opt_cover,index,parameter] = Optimal_cov(Total_cover,load,mode_c);
         if isempty(opt_cover) %when no cover found
             if(~isempty(live)) %Emergency stage
@@ -362,7 +367,7 @@ for l=1:iteration
                 [Node(live).role]= temp_r{:};
             end
         else
-             %storing optimal cover and cost of all cover in total cover
+            %storing optimal cover and cost of all cover in total cover
             cov_val{end+1} = opt_cover;
             cov_ind = [cov_ind index];
             par_val{end+1} = parameter;
@@ -381,13 +386,13 @@ for l=1:iteration
         end
                 % not calculating parameter here because loop_count is multiple of
                 % data_count.
-        flag =1; %resettig the flag after periodic check is done
-            end
+    flag =1; %resettig the flag after periodic check is done
+    end
         
-            if (check==0 || flag==0) && mod(l,data_count)==0
+    if (check==0 || flag==0) && mod(l,data_count)==0
         %parameter calculate periodically
-                live = find([Node(:).status]&[Node(:).exist]==1);
-                dead = find(((~[Node(:).status])&[Node(:).exist])==1);
+        live = find([Node(:).status]&[Node(:).exist]==1);
+        dead = find(((~[Node(:).status])&[Node(:).exist])==1);
         par_it= [par_it l];% store iteration number when parameters evaluated
         % storing tag,energy,role of live and dead nodes
         tag_l{end+1} = [Node(live).tag];

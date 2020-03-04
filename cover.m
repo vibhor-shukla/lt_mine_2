@@ -1,4 +1,4 @@
-function [ vertex,load ] = cover( node_tag,Sink_neighbor,mode )
+function [ vertex,load ] = cover( l, node_tag,Sink_neighbor,mode )
 % Find all conncted vertex cover
 
 global Node
@@ -7,10 +7,16 @@ load = {}; % load of individual node in cover set
 n = size(node_tag,2); % total live nodes
 sum1 = sum(node_tag); % Sum of all tag values is unique.
 
+if n == 0
+    return;
+end
+
 % For all possible power set of live nodes being as cover.
-for i = 1:(2^n-1)
+%for i = 1:(2^n-1);
+ i = (2^n - 1); 
     % decimal to binary
     pos_cov = de2bi(i,n); %LSB-MSB
+    %pos_cov
     %pos_cov = int_bin(i,n); MSB-LSB
     pos_cov = logical(pos_cov);
     % collection of all neighbors of taken cover set.
@@ -36,6 +42,5 @@ for i = 1:(2^n-1)
             end
         end
     end
-end
-
+%end
 end
