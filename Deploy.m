@@ -18,11 +18,6 @@ X_w1 = 0:2 * x_int:length_interest;
 X_r = X_w1(1)+(2 * x_int / 3):2 * x_int:length_interest-x_int/2;
 X_w2 = X_r(1) + (2 * x_int / 3):2 * x_int:length_interest;
 
-X_w21 = X_w2;
-X_w22 = X_w2;
-
-X_w11 = X_w1;
-X_w12 = X_w1;
 
 s1 = size(X_w1, 2);
 s2 = size(X_r, 2);
@@ -52,6 +47,12 @@ size(X_w1, 2) + size(X_r, 2) + size(X_w2, 2)
 
 % prompt_del = 'Enter the file name to store data: ';
 % file_del = input(prompt_del,'s');
+
+X_w21 = X_w2;
+X_w22 = X_w2;
+
+X_w11 = X_w1;
+X_w12 = X_w1;
 
 Y_w1 = zeros([1 size(X_w1,2)]);
 Y_r = (Width/2).*ones([1 size(X_r,2)]);

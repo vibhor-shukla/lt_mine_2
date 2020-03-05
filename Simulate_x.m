@@ -19,11 +19,11 @@ E_threshold = 2.5; % Minimum energy after which node cann't be relay(volts)
 E_die = 1.8; % Energy after which node cannnot work(volts).
 Status = [1;0]; % live and dead.%Status = ['L';'D'];
 Role = ['S';'R';'B';'E']; % sensor or relay or both and emergency
-Length_interest = 240; %deployment lenght of galary
+Length_interest = 440; %deployment lenght of galary
 Start_length = 100;
 global Rcom
 Rcom = 40; % communication range of sensor
-max_node = 20; % maximum nodes for simulations
+max_node = 50; % maximum nodes for simulations
 % Storing tag values in size
 tag(1:max_node) = {0};
 for i=1:max_node
@@ -104,9 +104,9 @@ temp(1:max_node) = {0};
 %Addition(Length_interest,0,Start_length); %initializing deployment
 Addition(Length_interest,0,Length_interest); %initializing deployment
 
-size(find([Node(:).status]&[Node(:).exist]==1), 2)
-del = find([Node(:).status])
-
+% p1 = size(find([Node(:).status]&[Node(:).exist]==1), 2)
+% p2 = find([Node(:).status])
+% pause;
 
 
 iteration = 2500;
