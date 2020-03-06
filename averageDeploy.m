@@ -18,41 +18,37 @@ X_w1 = 0:2 * x_int:length_interest;
 X_r = X_w1(1)+(2 * x_int / 3):2 * x_int:length_interest-x_int/2;
 X_w2 = X_r(1) + (2 * x_int / 3):2 * x_int:length_interest;
 
+X_r = 0:x_int:length_interest - x_int;
 
-s1 = size(X_w1, 2);
-s2 = size(X_r, 2);
-s3 = size(X_w2, 2);
-
-siz = min(min(s1, s2), s3);
-%siz = min(siz, s3);
-
-while(size(X_w1, 2) > siz)
-    X_w1(end) = [];
-end
-
-while(size(X_r, 2) > siz)
-   X_r(end) = [];
-end
-
-while(size(X_w2, 2) > siz)
-    X_w2(end) = [];
-end
+% s1 = size(X_w1, 2);
+% s2 = size(X_r, 2);
+% s3 = size(X_w2, 2);
+% 
+% siz = min(min(s1, s2), s3);
+% %siz = min(siz, s3);
+% 
+% while(size(X_w1, 2) > siz)
+%     X_w1(end) = [];
+% end
+% 
+% while(size(X_r, 2) > siz)
+%    X_r(end) = [];
+% end
+% 
+% while(size(X_w2, 2) > siz)
+%     X_w2(end) = [];
+% end
 
 % s1
 % s2
 % s3
 % length_interest
-size(X_w1, 2) + size(X_r, 2) + size(X_w2, 2)
+% size(X_w1, 2) + size(X_r, 2) + size(X_w2, 2)
 %size(X_w1, 2) + size(X_w2, 2)
 
 % prompt_del = 'Enter the file name to store data: ';
 % file_del = input(prompt_del,'s');
 
-X_w21 = X_w2;
-X_w22 = X_w2;
-
-X_w11 = X_w1;
-X_w12 = X_w1;
 
 Y_w1 = zeros([1 size(X_w1,2)]);
 Y_r = (Width/2).*ones([1 size(X_r,2)]);
@@ -97,16 +93,16 @@ Z_w22 = Z_w2;
 % end
 
 % storing all X,Y,Z indices of nodes
-X = {X_w1;X_r;X_w2};
-Y = {Y_w1;Y_r;Y_w2};
-Z = {Z_w1;Z_r;Z_w2};
+X = {X_r};
+Y = {Y_r};
+Z = {Z_r};
 
 % counting number of nodes deployed
 n_w1 = size(X_w1,2);
 n_w2 = size(X_w2,2);
 n_r = size(X_r,2);
-Total_node = n_w1+n_w2;
-each_side = [n_w1,n_w2];
+Total_node = n_r;
+each_side = [n_r];
 
 % initializing node degrees to zeros.
 deg_w1=zeros([1 n_w1]); 
@@ -114,74 +110,67 @@ deg_w2=zeros([1 n_w2]);
 deg_r=zeros([1 n_r]);
 
 % sink
-X_s = X_w1(end)+(x_int/2);
+X_s = X_r(end)+(x_int/2);
 Y_s = Width / 2;
-Z_s = h3 * 2;
+Z_s = Z_r(1);
 Sink = [X_s,Y_s,Z_s];
 %% plotting.
 %plotting nodes and defining connectivity between them
 view(0, 90)
 figure(1);
-scatter3(X_w1,Y_w1,Z_w1,'b');
+% scatter3(X_w1,Y_w1,Z_w1,'b');
 hold on;
-scatter3(X_w2,Y_w2,Z_w2,'b');
+% scatter3(X_w2,Y_w2,Z_w2,'b');
 scatter3(X_r,Y_r,Z_r,'b');
 
-scatter3(X_w11,Y_w11,Z_w11,'g', 'filled');
-scatter3(X_w12,Y_w12,Z_w12,'g', 'filled');
-scatter3(X_w21,Y_w21,Z_w21,'g', 'filled');
-scatter3(X_w22,Y_w22,Z_w22,'g', 'filled');
+% scatter3(X_w11,Y_w11,Z_w11,'g', 'filled');
+% scatter3(X_w12,Y_w12,Z_w12,'g', 'filled');
+% scatter3(X_w21,Y_w21,Z_w21,'g', 'filled');
+% scatter3(X_w22,Y_w22,Z_w22,'g', 'filled');
 
 scatter3(X_s,Y_s,Z_s,'black','s','fill');
 
-for i = 1:n_w1
-    % betweem wall 1 and wall 2.
-    for j= 1:n_w2
-        if dist([X_w1(i) X_w2(j)],[Y_w1(i) Y_w2(j)],[Z_w1(i) Z_w2(j)])<=Rcom
-%              plot3([X_w1(i) X_w2(j)],[Y_w1(i) Y_w2(j)],[Z_w1(i) Z_w2(j)],'b');
+for j= 1:n_r
+    for i = 1:n_r
+        if i~= j && dist([X_r(i) X_r(j)],[Y_r(i) Y_r(j)],[Z_r(i) Z_r(j)])<=Rcom
+    %               plot3([X_w1(i) X_r(j)],[Y_w1(i) Y_r(j)],[Z_w1(i) Z_r(j)],'r');
              % updating degree count of nodes.
-             deg_w1(i)=deg_w1(i)+1;
-             deg_w2(j)=deg_w2(j)+1;
-        end
-    end 
-    %Between wall 1 and roof
-    for j= 1:n_r
-        if dist([X_w1(i) X_r(j)],[Y_w1(i) Y_r(j)],[Z_w1(i) Z_r(j)])<=Rcom
-%               plot3([X_w1(i) X_r(j)],[Y_w1(i) Y_r(j)],[Z_w1(i) Z_r(j)],'r');
-             % updating degree count of nodes.
-             deg_w1(i)=deg_w1(i)+1;
+%              deg_w1(i)=deg_w1(i)+1;
              deg_r(j)=deg_r(j)+1;
         end
+    end
+    if j + 1 <= size(X_r, 2)
+        plot3([X_r(j) X_r(j + 1)],[Y_r(j) Y_r(j + 1)],[Z_r(j) Z_r(j + 1)],'r');
     end
 end
 
 %Between wall 2 and roof
-for i= 1:n_w2
-    for j= 1:n_r
-        if dist([X_w2(i) X_r(j)],[Y_w2(i) Y_r(j)],[Z_w2(i) Z_r(j)])<=Rcom
-%               plot3([X_w2(i) X_r(j)],[Y_w2(i) Y_r(j)],[Z_w2(i) Z_r(j)],'r');
-             % updating degree count of nodes.
-             deg_w2(i)=deg_w2(i)+1;
-             deg_r(j)=deg_r(j)+1;
-        end
-    end
-end
-
-for i = 1:n_w1 - 1
-    plot3([X_w1(i) X_w1(i + 1)],[Y_w1(i) Y_w1(i + 1)], [Z_w1(i) Z_w1(i + 1)], 'b');
-    plot3([X_w1(i) X_r(i)],[Y_w1(i) Y_r(i)], [Z_w1(i) Z_r(i)], 'b');
-    plot3([X_w1(i) X_w11(i)],[Y_w1(i) Y_w11(i)], [Z_w1(i) Z_w11(i)], 'b');
-    plot3([X_w11(i) X_w12(i)],[Y_w11(i) Y_w12(i)], [Z_w11(i) Z_w12(i)], 'b');
-end
-for i = 1:n_w2 - 1
-    plot3([X_w2(i) X_w2(i + 1)],[Y_w2(i) Y_w2(i + 1)], [Z_w2(i) Z_w2(i + 1)], 'b');
-    plot3([X_w2(i) X_r(i)],[Y_w2(i) Y_r(i)], [Z_w2(i) Z_r(i)], 'b');
-    plot3([X_w2(i) X_w21(i)],[Y_w2(i) Y_w21(i)], [Z_w2(i) Z_w21(i)], 'b');
-    plot3([X_w21(i) X_w22(i)],[Y_w21(i) Y_w22(i)], [Z_w21(i) Z_w22(i)], 'b');
-end
-for i = 1:n_r - 1
-    plot3([X_r(i) X_r(i + 1)],[Y_r(i) Y_r(i + 1)], [Z_r(i) Z_r(i + 1)], 'r');
-end
+% for i= 1:n_w2
+%     for j= 1:n_r
+%         if dist([X_w2(i) X_r(j)],[Y_w2(i) Y_r(j)],[Z_w2(i) Z_r(j)])<=Rcom
+% %               plot3([X_w2(i) X_r(j)],[Y_w2(i) Y_r(j)],[Z_w2(i) Z_r(j)],'r');
+%              % updating degree count of nodes.
+%              deg_w2(i)=deg_w2(i)+1;
+%              deg_r(j)=deg_r(j)+1;
+%         end
+%     end
+% end
+% 
+% for i = 1:n_w1 - 1
+%     plot3([X_w1(i) X_w1(i + 1)],[Y_w1(i) Y_w1(i + 1)], [Z_w1(i) Z_w1(i + 1)], 'b');
+%     plot3([X_w1(i) X_r(i)],[Y_w1(i) Y_r(i)], [Z_w1(i) Z_r(i)], 'b');
+%     plot3([X_w1(i) X_w11(i)],[Y_w1(i) Y_w11(i)], [Z_w1(i) Z_w11(i)], 'b');
+%     plot3([X_w11(i) X_w12(i)],[Y_w11(i) Y_w12(i)], [Z_w11(i) Z_w12(i)], 'b');
+% end
+% for i = 1:n_w2 - 1
+%     plot3([X_w2(i) X_w2(i + 1)],[Y_w2(i) Y_w2(i + 1)], [Z_w2(i) Z_w2(i + 1)], 'b');
+%     plot3([X_w2(i) X_r(i)],[Y_w2(i) Y_r(i)], [Z_w2(i) Z_r(i)], 'b');
+%     plot3([X_w2(i) X_w21(i)],[Y_w2(i) Y_w21(i)], [Z_w2(i) Z_w21(i)], 'b');
+%     plot3([X_w21(i) X_w22(i)],[Y_w21(i) Y_w22(i)], [Z_w21(i) Z_w22(i)], 'b');
+% end
+% for i = 1:n_r - 1
+%     plot3([X_r(i) X_r(i + 1)],[Y_r(i) Y_r(i + 1)], [Z_r(i) Z_r(i + 1)], 'r');
+% end
 
 
 xlim([0 length_interest]);
@@ -197,10 +186,10 @@ hold off;
 
 % plotting degree of nodes in the graph
 figure(2);
-subplot(1,3,1)
-plot(1:n_w1,deg_w1,'-*');
-subplot(1,3,2)
-plot(1:n_w2,deg_w2,'-*');
+% subplot(1,3,1)
+% plot(1:n_w1,deg_w1,'-*');
+% subplot(1,3,2)
+% plot(1:n_w2,deg_w2,'-*');
 subplot(1,3,3)
 plot(1:n_r,deg_r,'-*');
 
