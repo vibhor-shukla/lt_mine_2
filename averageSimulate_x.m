@@ -12,7 +12,7 @@ while numel(mode_c)==0||mode_c~=1&&mode_c~=0 %checking waid entry
     mode_c = input('Entry not valid! Re-enter the mode:\nEnter the  mode: 1->CG; 0->TG: ');
 end
 %file1 = 'Random_destroy_5.mat';
-Total_dep_side=3; % define three sides w1,r,w2
+Total_dep_side=2; % define three sides w1,r,w2
 E_max=5; %maximum energy of a fresh node.in volts
 % change made to threshold and die energies should also be done in Energy_fun().
 E_threshold = 2.5; % Minimum energy after which node cann't be relay(volts)
@@ -30,7 +30,7 @@ for i=1:max_node
     tag(i) = {max_node+1-i};
 end
 tag=rot90(tag); %anticlock wise
-Pos = {'wall_1','roof', 'wall_2'};
+Pos = {'wall_1','wall_2'};
 Exist = [1;0];
 Mode = [1,2]; % Active->1  Sleep->2
 global Node

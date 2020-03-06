@@ -106,7 +106,7 @@ n_w1 = size(X_w1,2);
 n_w2 = size(X_w2,2);
 n_r = size(X_r,2);
 Total_node = n_w1+n_w2;
-each_side = [n_w1,n_w2, n_r];
+each_side = [n_w1,n_w2];
 
 % initializing node degrees to zeros.
 deg_w1=zeros([1 n_w1]); 
