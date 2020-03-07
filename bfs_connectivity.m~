@@ -1,5 +1,5 @@
 function [ in_range, mx_lvl] = bfs_connectivity(node_tag, Sink_neighbor, each_side)
-ttt = Sink_neighbor
+
 global Node
 cnt = 0;
 ind = 1;
@@ -13,8 +13,9 @@ vis = [];
 for i = 1:each_side * 3;
     vis = [vis 0];
 end
+
 for i = 1:size(nodes, 2)
-    vis(nodes(i)) = 1;
+    vis[nodes(i).tag] = 1;
     Node(nodes(i)).lvl = 1;
 end
 while ind <= size(nodes, 2)
