@@ -113,7 +113,7 @@ live = find([Node(:).status]&[Node(:).exist]==1)
 
 mx_lvl
 
-pause;
+% pause;
 
 
 iteration = 2500;
@@ -426,7 +426,14 @@ for l=1:iteration
     mean_energy = [mean_energy; l cmean];
     maxl = [maxl; l mx_lvl];
 end
-
+if Length_interest == 500
+    writematrix(prt, '/home/vajrang/Downloads/sem8/final_year_project/code/send/500/live_nodes/pre.csv');
+    writematrix(mean_energy, '/home/vajrang/Downloads/sem8/final_year_project/code/send/500/energy/pre.csv');
+end
+if Length_interest == 250
+    writematrix(prt, '/home/vajrang/Downloads/sem8/final_year_project/code/send/250/live_nodes/pre.csv');
+    writematrix(mean_energy, '/home/vajrang/Downloads/sem8/final_year_project/code/send/250/energy/pre.csv');
+end
 %emergency = unique(emergency);
 %% storing value with destruction
 % rename file each time simulating accordingly

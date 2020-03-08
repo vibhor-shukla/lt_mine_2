@@ -111,11 +111,11 @@ for i= 1:n_w2
     end
 end
 
-% for i = 1:n_w1
-%     plot3([X_w1(i) X_w2(i)], [Y_w1(i) Y_w2(i)], [Z_w1(i) Z_w2(i)]);
-%     plot3([X_r(i) X_w2(i)], [Y_r(i) Y_w2(i)], [Z_r(i) Z_w2(i)]);
-%     plot3([X_w1(i) X_r(i)], [Y_w1(i) Y_r(i)], [Z_w1(i) Z_r(i)]);
-% end
+for i = 1:n_w1
+    plot3([X_w1(i) X_w2(i)], [Y_w1(i) Y_w2(i)], [Z_w1(i) Z_w2(i)]);
+    plot3([X_r(i) X_w2(i)], [Y_r(i) Y_w2(i)], [Z_r(i) Z_w2(i)]);
+    plot3([X_w1(i) X_r(i)], [Y_w1(i) Y_r(i)], [Z_w1(i) Z_r(i)]);
+end
  xlim([0 length_interest]);
  ylim([0 Width]);
  zlim([0 Height]);

@@ -84,7 +84,7 @@ for i=1:number_node
     end
 end
 number_node
-pause;
+% pause;
 %% GRAPH cover for initial iteration/complete deployment
 
 % Node tag is also node access index
@@ -108,7 +108,7 @@ live = find([Node(:).status]&[Node(:).exist]==1)
 [in_range, mx_lvl] = bfs_connectivity(live, Sink_neighbor, each_side);
 
 mx_lvl
-pause;
+% pause;
 
 iteration = 2500;
 prob_d = 0.02; % probability for random destroy
@@ -415,6 +415,15 @@ for l=1:iteration
     prt = [prt;l size(live, 2)];
     [cmean] = MeanEnergy(k);
     mean_energy = [mean_energy; l cmean];
+end
+
+if Length_interest == 500
+    writematrix(prt, '/home/vajrang/Downloads/sem8/final_year_project/code/send/500/live_nodes/layered.csv');
+    writematrix(mean_energy, '/home/vajrang/Downloads/sem8/final_year_project/code/send/500/energy/layered.csv');
+end
+if Length_interest == 250
+    writematrix(prt, '/home/vajrang/Downloads/sem8/final_year_project/code/send/250/live_nodes/layered.csv');
+    writematrix(mean_energy, '/home/vajrang/Downloads/sem8/final_year_project/code/send/250/energy/layered.csv');
 end
 
 %emergency = unique(emergency);

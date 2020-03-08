@@ -50,6 +50,7 @@ end
 % pause;
 for i = size(nodes, 2):-1:1
     cur = nodes(i);
+    Node(cur).lvl = 1;
     for cc = 1:size(Node(cur).neighbor, 2)
         go = Node(cur).neighbor(cc);
         if vis(go) == 1 && Node(go).lvl == Node(cur).lvl + 1
