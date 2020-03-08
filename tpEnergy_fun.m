@@ -14,7 +14,7 @@ D_fxd = 4e-3;
 E_threshold = 2.5;
 E_die = 1.8;
 n = length(node_tag);
-reduce = (S_fxd + R_fxd) / mx_lvl;
+reduce = (R_fxd);
 if flag==1 %  when health state called
     for i=1:n
         if (Node(node_tag(i)).energy<=E_die) % condition for dead node
@@ -65,7 +65,7 @@ else
              Node(node_tag(i)).status=0;
         else
 %              Node(node_tag(i)).energy = Node(node_tag(i)).energy-S_fxd-R_fxd;
-            Node(node_tag(i)).energy = Node(node_tag(i)).energy-(reduce * Node(node_tag(i)).lvl);
+            Node(node_tag(i)).energy = Node(node_tag(i)).energy-S_fxd - (reduce * Node(node_tag(i)).lvl);
             if (Node(node_tag(i)).energy<=E_die) % condition for dead node
                 Node(node_tag(i)).status=0;
             end

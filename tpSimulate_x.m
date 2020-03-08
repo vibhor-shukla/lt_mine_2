@@ -19,7 +19,7 @@ E_threshold = 2.5; % Minimum energy after which node cann't be relay(volts)
 E_die = 1.8; % Energy after which node cannnot work(volts).
 Status = [1;0]; % live and dead.%Status = ['L';'D'];
 Role = ['S';'R';'B';'E']; % sensor or relay or both and emergency
-Length_interest = 500; %deployment lenght of galary
+Length_interest = 250; %deployment lenght of galary
 Start_length = 100;
 global Rcom
 Rcom = 40; % communication range of sensor
@@ -34,7 +34,7 @@ Pos = {'wall_1','roof', 'wall_2'};
 Exist = [1;0];
 Mode = [1,2]; % Active->1  Sleep->2
 global Node
-Node = struct('tag',tag,'energy',E_max,'neighbor',[],'status',Status(2),'role',Role(1),'loc',[],'pos',[],'exist',Exist(2),'mode',Mode(1), 'lvl', -1);
+Node = struct('tag',tag,'energy',E_max,'neighbor',[],'status',Status(2),'role',Role(1),'loc',[],'pos',[],'exist',Exist(2),'mode',Mode(1), 'lvl', -1, 'npar', -1);
 Sink_neighbor =[];
 %% DEPLOY and obtain deployment parameters as output
 
@@ -110,6 +110,8 @@ Addition(Length_interest,0,Length_interest); %initializing deployment
 live = find([Node(:).status]&[Node(:).exist]==1)
 [in_range, mx_lvl] = bfs_connectivity(live, Sink_neighbor, each_side);
 
+mx_lvl
+pause;
 
 iteration = 2500;
 prob_d = 0.02; % probability for random destroy
@@ -184,6 +186,7 @@ for l=1:iteration
     check = 0;
     m_in = 0;
     l
+    mx_lvl
 %     %% Without cover        
 %     live = find([Node(:).status]&[Node(:).exist]==1);
 %     temp_r(1:length(live)) = {'B'};

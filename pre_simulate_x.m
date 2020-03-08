@@ -34,7 +34,7 @@ Pos = {'wall_1','roof', 'wall_2'};
 Exist = [1;0];
 Mode = [1,2]; % Active->1  Sleep->2
 global Node
-Node = struct('tag',tag,'energy',E_max,'neighbor',[],'status',Status(2),'role',Role(1),'loc',[],'pos',[],'exist',Exist(2),'mode',Mode(1), 'lvl', -1);
+Node = struct('tag',tag,'energy',E_max,'neighbor',[],'status',Status(2),'role',Role(1),'loc',[],'pos',[],'exist',Exist(2),'mode',Mode(1), 'lvl', -1, 'npar', -1);
 Sink_neighbor =[];
 %% DEPLOY and obtain deployment parameters as output
 
@@ -45,7 +45,8 @@ Sink_neighbor =[];
 
 sides = 1; % iterator for w1,r,w2 -> 1,2,3.
 %size = [n_w1,n_r,n_w2]; % array of total number of
-k=1; % Deployed node access loop variable
+global k; % Deployed node access loop variable
+k = 1;
 % for all sides
 while sides<=Total_dep_side
     % Assigning location coordinates and position of all node to respective
@@ -109,6 +110,10 @@ Addition(Length_interest,0,Length_interest); %initializing deployment
 % pause;
 live = find([Node(:).status]&[Node(:).exist]==1)
 [in_range, mx_lvl] = bfs_connectivity(live, Sink_neighbor, each_side);
+
+mx_lvl
+
+pause;
 
 
 iteration = 2500;
@@ -180,10 +185,13 @@ rng('shuffle');
 flag=0;
 prt = [];
 mean_energy = [];
+maxl = [];
 for l=1:iteration
     check = 0;
     m_in = 0;
     l
+    mx_lvl
+%     pause;
 %     %% Without cover        
 %     live = find([Node(:).status]&[Node(:).exist]==1);
 %     temp_r(1:length(live)) = {'B'};
@@ -357,6 +365,8 @@ for l=1:iteration
    % periodic only when any relay was dead earlier and no update due to addition
     num_live = find([Node(:).status]&[Node(:).exist]==1);
     if (l==1)||mod(l,data_count)==0 % && (check==0 || flag==0) %&& mod(l,loop_count)==0
+        [in_range, mx_lvl] = bfs_connectivity(live, Sink_neighbor, each_side);
+        fprintf('call');
         tpEnergy_fun(1, each_count, mx_lvl); % for health check state
         live = find([Node(:).status]&[Node(:).exist]==1);
         dead = find(((~[Node(:).status])&[Node(:).exist])==1);
@@ -414,6 +424,7 @@ for l=1:iteration
     prt = [prt;l size(live, 2)];
     [cmean] = MeanEnergy(k);
     mean_energy = [mean_energy; l cmean];
+    maxl = [maxl; l mx_lvl];
 end
 
 %emergency = unique(emergency);
