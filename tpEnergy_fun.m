@@ -14,7 +14,7 @@ D_fxd = 4e-3;
 E_threshold = 2.5;
 E_die = 1.8;
 n = length(node_tag);
-reduce = (S_fxd + R_fxd);
+reduce = (S_fxd + R_fxd) / mx_lvl;
 if flag==1 %  when health state called
     for i=1:n
         if (Node(node_tag(i)).energy<=E_die) % condition for dead node

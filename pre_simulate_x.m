@@ -12,7 +12,7 @@ while numel(mode_c)==0||mode_c~=1&&mode_c~=0 %checking waid entry
     mode_c = input('Entry not valid! Re-enter the mode:\nEnter the  mode: 1->CG; 0->TG: ');
 end
 %file1 = 'Random_destroy_5.mat';
-Total_dep_side=1; % define three sides w1,r,w2
+Total_dep_side=3; % define three sides w1,r,w2
 E_max=5; %maximum energy of a fresh node.in volts
 % change made to threshold and die energies should also be done in Energy_fun().
 E_threshold = 2.5; % Minimum energy after which node cann't be relay(volts)
@@ -30,7 +30,7 @@ for i=1:max_node
     tag(i) = {max_node+1-i};
 end
 tag=rot90(tag); %anticlock wise
-Pos = {'roof'};
+Pos = {'wall_1','roof', 'wall_2'};
 Exist = [1;0];
 Mode = [1,2]; % Active->1  Sleep->2
 global Node
@@ -38,10 +38,10 @@ Node = struct('tag',tag,'energy',E_max,'neighbor',[],'status',Status(2),'role',R
 Sink_neighbor =[];
 %% DEPLOY and obtain deployment parameters as output
 
-[number_node,X,Y,Z,each_side,sink]=averageDeploy(Length_interest,Rcom);
+[number_node,X,Y,Z,each_side,sink]= pre_deploy(Length_interest,Rcom);
 % Output: total nodes deployed, their coordinates and number of node in each side.
 
-%% Node Parameters assignment
+%% Node Parameters assitpEnergy_fun(1, each_count, mx_lvl);gnment
 
 sides = 1; % iterator for w1,r,w2 -> 1,2,3.
 %size = [n_w1,n_r,n_w2]; % array of total number of
@@ -107,9 +107,9 @@ Addition(Length_interest,0,Length_interest); %initializing deployment
 % p1 = size(find([Node(:).status]&[Node(:).exist]==1), 2)
 % p2 = find([Node(:).status])
 % pause;
-
 live = find([Node(:).status]&[Node(:).exist]==1)
 [in_range, mx_lvl] = bfs_connectivity(live, Sink_neighbor, each_side);
+
 
 iteration = 2500;
 prob_d = 0.02; % probability for random destroy
@@ -193,8 +193,8 @@ for l=1:iteration
 %      end
     
     %% Node level
-%     Energy_fun(0, each_count); % normal energy depletion
-    tpEnergy_fun(0, each_count, mx_lvl)
+    tpEnergy_fun(0, each_count, mx_lvl); % normal energy depletion
+    
 
     %Normal Destroy
 %     r = rand(1,1); %random number generate
@@ -423,7 +423,7 @@ save(file1,'Opt_cover','Index','Parameter','Total_Cover','Load','sink','data_cou
     'dest_val','cov_val','par_val','Dcov_val','Dpar_val','Acov_val','Apar_val','rep_val','dest_w_val',...
     'tag_l','ener_l','role_l','tag_d','ener_d','role_d',...
     'Atag_l','Aener_l','Arole_l','Atag_d','Aener_d','Arole_d',...
-    'Dtag_l','Dener_l','Drole_l','Dtag_d','Dener_d','Drole_d','cov_ind','prt');
+    'Dtag_l','Dener_l','Drole_l','Dtag_d','Dener_d','Drole_d','cov_ind');
 % prompt = 'Enter the time of evaluation: ';
 % time = input(prompt);
 % save(file1,'time','-append');

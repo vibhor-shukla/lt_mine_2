@@ -19,11 +19,11 @@ E_threshold = 2.5; % Minimum energy after which node cann't be relay(volts)
 E_die = 1.8; % Energy after which node cannnot work(volts).
 Status = [1;0]; % live and dead.%Status = ['L';'D'];
 Role = ['S';'R';'B';'E']; % sensor or relay or both and emergency
-Length_interest = 440; %deployment lenght of galary
+Length_interest = 500; %deployment lenght of galary
 Start_length = 100;
 global Rcom
 Rcom = 40; % communication range of sensor
-max_node = 50; % maximum nodes for simulations
+max_node = 100; % maximum nodes for simulations
 % Storing tag values in size
 tag(1:max_node) = {0};
 for i=1:max_node
@@ -356,6 +356,7 @@ for l=1:iteration
    % periodic only when any relay was dead earlier and no update due to addition
     num_live = find([Node(:).status]&[Node(:).exist]==1);
     if (l==1)||mod(l,data_count)==0 % && (check==0 || flag==0) %&& mod(l,loop_count)==0
+        [in_range, mx_lvl] = bfs_connectivity(live, Sink_neighbor, each_side);
         tpEnergy_fun(1, each_count, mx_lvl); % for health check state
         live = find([Node(:).status]&[Node(:).exist]==1);
         dead = find(((~[Node(:).status])&[Node(:).exist])==1);
@@ -423,7 +424,7 @@ save(file1,'Opt_cover','Index','Parameter','Total_Cover','Load','sink','data_cou
     'dest_val','cov_val','par_val','Dcov_val','Dpar_val','Acov_val','Apar_val','rep_val','dest_w_val',...
     'tag_l','ener_l','role_l','tag_d','ener_d','role_d',...
     'Atag_l','Aener_l','Arole_l','Atag_d','Aener_d','Arole_d',...
-    'Dtag_l','Dener_l','Drole_l','Dtag_d','Dener_d','Drole_d','cov_ind');
+    'Dtag_l','Dener_l','Drole_l','Dtag_d','Dener_d','Drole_d','cov_ind','prt');
 % prompt = 'Enter the time of evaluation: ';
 % time = input(prompt);
 % save(file1,'time','-append');

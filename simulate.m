@@ -20,11 +20,11 @@ E_threshold = 2.5; % Minimum energy after which node cann't be relay(volts)
 E_die = 1.8; % Energy after which node cannnot work(volts).
 Status = [1;0]; % live and dead.%Status = ['L';'D'];
 Role = ['S';'R';'B';'E']; % sensor or relay or both and emergency
-Length_interest = 200; %deployment lenght of galary
+Length_interest = 250; %deployment lenght of galary
 Start_length = 100;
 global Rcom
 Rcom = 40; % communication range of sensor
-max_node = 25; % maximum nodes for simulations
+max_node = 50; % maximum nodes for simulations
 % Storing tag values in size
 tag(1:max_node) = {0};
 for i=1:max_node
@@ -35,7 +35,7 @@ Pos = {'wall_1','roof','wall_2'};
 Exist = [1;0];
 Mode = [1,2]; % Active->1  Sleep->2
 global Node
-Node = struct('tag',tag,'energy',E_max,'neighbor',[],'status',Status(2),'role',Role(1),'loc',[],'pos',[],'exist',Exist(2),'mode',Mode(1));
+Node = struct('tag',tag,'energy',E_max,'neighbor',[],'status',Status(2),'role',Role(1),'loc',[],'pos',[],'exist',Exist(2),'mode',Mode(1), 'lvl', -1);
 Sink_neighbor =[];
 %% DEPLOY and obtain deployment parameters as output
 
@@ -52,21 +52,26 @@ k=1; % Deployed node access loop variable
 while sides<=Total_dep_side
     % Assigning location coordinates and position of all node to respective
     % values.
+    cnt = 1;
     for i=1:each_side(sides)      %1:size(X{sides},2)
         Node(k).loc = [X{sides}(i),Y{sides}(i),Z{sides}(i)];
         Node(k).pos = Pos{sides};
         % tagging is for W1,r,W2 subsequently in order for k.
         Node(k).exist = Exist(1);
+        Node(k).lvl = cnt;
+        cnt = cnt + 1;
         k=k+1;
     end
     sides = sides+1;
 end
 
+each_count = each_side(1);
+
 % finding neighbors for each node. Exclude those on same side
 for i=1:number_node
     for j= 1:number_node
         d=dist([Node(i).loc(1) Node(j).loc(1)],[Node(i).loc(2) Node(j).loc(2)],[Node(i).loc(3) Node(j).loc(3)]);
-         if d<=Rcom&&Node(j).exist&&mode_c %mode=1
+         if ~(j == i) && d<=Rcom&&Node(j).exist&&mode_c %mode=1
              Node(i).neighbor = [Node(i).neighbor, Node(j).tag];
          elseif d<=Rcom&&Node(j).exist&&~strcmp(Node(i).pos,Node(j).pos) %mode=0
             Node(i).neighbor = [Node(i).neighbor, Node(j).tag];
@@ -87,7 +92,7 @@ end
 % Node tag is also node access index
 [Graph_node] = find([Node(:).status]&[Node(:).exist]==1); % taking graph node/deployed
 % [Total_Cover,Load] = cover(Graph_node);
-[Total_Cover,Load] = cover(Graph_node,Sink_neighbor,mode_c); %cell array of all possible covers
+[Total_Cover,Load] = cover(0, Graph_node,Sink_neighbor,mode_c); %cell array of all possible covers
 % Finding minimum cover size and its index in cell of all covers.
 %%[min,index] = min(cellfun('size',Total_cover,2));
 [Opt_cover,Index,Parameter] = Optimal_cov(Total_Cover,Load,mode_c);
@@ -100,6 +105,9 @@ temp(1:max_node) = {0};
 [Node.exist] = temp{:};% reassigning value for simulation
 [Node.status] = temp{:};% reassigning value for simulation
 Addition(Length_interest,0,Start_length); %initializing deployment
+
+live = find([Node(:).status]&[Node(:).exist]==1)
+[in_range, mx_lvl] = bfs_connectivity(live, Sink_neighbor, each_side);
 
 iteration = 2500;
 prob_d = 0.2; % probability for random destroy
@@ -174,13 +182,15 @@ for l=1:iteration
     % break condition has to be checked 21/4/2019 !!Checked-5/1/2019
     check = 0;
     m_in = 0;
+    l
     live = find([Node(:).status]&[Node(:).exist]==1);
     if isempty(intersect(Sink_neighbor,live)) || (numel(live)==1 && dist([Node(live).loc(1),sink(1)],[Node(live).loc(2),sink(2)],[Node(live).loc(3),sink(3)]) > Rcom)
        break; 
     end
     %% Inititalizing
     if l==1
-        Energy_fun(1); % for health check state
+%         Energy_fun(1); % for health check state
+        tpEnergy_fun(0, each_count, mx_lvl);
         live = find([Node(:).status]&[Node(:).exist]==1);
         dead = find(((~[Node(:).status])&[Node(:).exist])==1);
         %         [Total_cover,load] = cover(live);
@@ -222,7 +232,8 @@ for l=1:iteration
     end
     
     %% Node level
-    Energy_fun(0); % normal energy depletion
+    [in_range, mx_lvl] = bfs_connectivity(live, Sink_neighbor, each_side);
+    tpEnergy_fun(0, each_count, mx_lvl); % normal energy depletion
     
     %Normal Destroy
     r = rand(1,1); %random number generate
@@ -255,7 +266,8 @@ for l=1:iteration
     
     % new cover decision when network destruction and a relay is dead
     if check==1 && flag==1% && mod(l,data_count)==0
-        Energy_fun(1); % for health check state
+        [in_range, mx_lvl] = bfs_connectivity(live, Sink_neighbor, each_side);
+        tpEnergy_fun(1, each_count, mx_lvl); % for health check state
         live = find([Node(:).status]&[Node(:).exist]==1);
         dead = find(((~[Node(:).status])&[Node(:).exist])==1);
         %         [Total_cover,load] = cover(live);
@@ -339,7 +351,8 @@ for l=1:iteration
     
     % new cover decision when there is  network addition or repair
     if check==3||check==2
-        Energy_fun(1); % for health check state
+        [in_range, mx_lvl] = bfs_connectivity(live, Sink_neighbor, each_side);
+        tpEnergy_fun(1, each_count, mx_lvl); % for health check state
         live = find([Node(:).status]&[Node(:).exist]==1);
         dead = find(((~[Node(:).status])&[Node(:).exist])==1);
         %         [Total_cover,load] = cover(live);
@@ -384,7 +397,8 @@ for l=1:iteration
     %% Perioic Cover Evaluate
     % periodic only when any relay was dead earlier and no update due to addition
     if mod(l,data_count)==0 && (check==0 || flag==0) %&& mod(l,loop_count)==0
-        Energy_fun(1); % for health check state
+        [in_range, mx_lvl] = bfs_connectivity(live, Sink_neighbor, each_side);
+        tpEnergy_fun(1, each_count, mx_lvl); % for health check state
         live = find([Node(:).status]&[Node(:).exist]==1);
         dead = find(((~[Node(:).status])&[Node(:).exist])==1);
         %         [Total_cover,load] = cover(live);
