@@ -16,13 +16,34 @@ X_w1 = 0:x_int:length_interest;
 X_r = X_w1(1)+x_int/2:x_int:length_interest-x_int/2;
 X_w2 = 0:x_int:length_interest;
 
-Y_w1 = zeros([1 size(X_w1,2)]);
-Y_r = (Width/2).*ones([1 size(X_r,2)]);
-Y_w2 = Y_w1 + Width;
+s1 = size(X_w1, 2);
+s2 = size(X_r, 2);
+s3 = size(X_w2, 2);
 
-Z_w1 = (Height/2).*ones([1 size(X_w1,2)]);
+siz = min(min(s1, s2), s3);
+%siz = min(siz, s3);
+
+while(size(X_w1, 2) > siz)
+    X_w1(end) = [];
+end
+
+while(size(X_r, 2) > siz)
+   X_r(end) = [];
+end
+
+while(size(X_w2, 2) > siz)
+    X_w2(end) = [];
+end
+
+Y_w1 = (Width/4).*ones([1 size(X_w1,2)]);
+Y_r = (Width/2).*ones([1 size(X_r,2)]);
+Y_w2 = Y_w1 + (Width / 2);
+
+Z_w1 = (Height).*ones([1 size(X_w1,2)]);
 Z_r = Height.*ones([1 size(X_r,2)]);
-Z_w2 = (Height/2).*ones([1 size(X_w2,2)]);
+Z_w2 = (Height).*ones([1 size(X_w2,2)]);
+
+
 
 % storing all X,Y,Z indices of nodes
 X = {X_w1;X_r;X_w2};
@@ -60,7 +81,7 @@ for i = 1:n_w1
     % betweem wall 1 and wall 2.
     for j= 1:n_w2
         if dist([X_w1(i) X_w2(j)],[Y_w1(i) Y_w2(j)],[Z_w1(i) Z_w2(j)])<=Rcom
-             plot3([X_w1(i) X_w2(j)],[Y_w1(i) Y_w2(j)],[Z_w1(i) Z_w2(j)],'b');
+%              plot3([X_w1(i) X_w2(j)],[Y_w1(i) Y_w2(j)],[Z_w1(i) Z_w2(j)],'b');
              % updating degree count of nodes.
              deg_w1(i)=deg_w1(i)+1;
              deg_w2(j)=deg_w2(j)+1;
@@ -69,7 +90,7 @@ for i = 1:n_w1
     % Between wall 1 and roof
     for j= 1:n_r
         if dist([X_w1(i) X_r(j)],[Y_w1(i) Y_r(j)],[Z_w1(i) Z_r(j)])<=Rcom
-             plot3([X_w1(i) X_r(j)],[Y_w1(i) Y_r(j)],[Z_w1(i) Z_r(j)],'r');
+%              plot3([X_w1(i) X_r(j)],[Y_w1(i) Y_r(j)],[Z_w1(i) Z_r(j)],'r');
              % updating degree count of nodes.
              deg_w1(i)=deg_w1(i)+1;
              deg_r(j)=deg_r(j)+1;
@@ -82,7 +103,7 @@ end
 for i= 1:n_w2
     for j= 1:n_r
         if dist([X_w2(i) X_r(j)],[Y_w2(i) Y_r(j)],[Z_w2(i) Z_r(j)])<=Rcom
-             plot3([X_w2(i) X_r(j)],[Y_w2(i) Y_r(j)],[Z_w2(i) Z_r(j)],'r');
+%              plot3([X_w2(i) X_r(j)],[Y_w2(i) Y_r(j)],[Z_w2(i) Z_r(j)],'r');
              % updating degree count of nodes.
              deg_w2(i)=deg_w2(i)+1;
              deg_r(j)=deg_r(j)+1;
@@ -90,6 +111,11 @@ for i= 1:n_w2
     end
 end
 
+% for i = 1:n_w1
+%     plot3([X_w1(i) X_w2(i)], [Y_w1(i) Y_w2(i)], [Z_w1(i) Z_w2(i)]);
+%     plot3([X_r(i) X_w2(i)], [Y_r(i) Y_w2(i)], [Z_r(i) Z_w2(i)]);
+%     plot3([X_w1(i) X_r(i)], [Y_w1(i) Y_r(i)], [Z_w1(i) Z_r(i)]);
+% end
  xlim([0 length_interest]);
  ylim([0 Width]);
  zlim([0 Height]);

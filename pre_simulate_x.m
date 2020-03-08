@@ -19,7 +19,7 @@ E_threshold = 2.5; % Minimum energy after which node cann't be relay(volts)
 E_die = 1.8; % Energy after which node cannnot work(volts).
 Status = [1;0]; % live and dead.%Status = ['L';'D'];
 Role = ['S';'R';'B';'E']; % sensor or relay or both and emergency
-Length_interest = 500; %deployment lenght of galary
+Length_interest = 250; %deployment lenght of galary
 Start_length = 100;
 global Rcom
 Rcom = 40; % communication range of sensor
@@ -179,6 +179,7 @@ Drole_d={}; %role->dead;
 rng('shuffle');
 flag=0;
 prt = [];
+mean_energy = [];
 for l=1:iteration
     check = 0;
     m_in = 0;
@@ -411,6 +412,8 @@ for l=1:iteration
         
     end
     prt = [prt;l size(live, 2)];
+    [cmean] = MeanEnergy(k);
+    mean_energy = [mean_energy; l cmean];
 end
 
 %emergency = unique(emergency);
@@ -423,7 +426,7 @@ save(file1,'Opt_cover','Index','Parameter','Total_Cover','Load','sink','data_cou
     'dest_val','cov_val','par_val','Dcov_val','Dpar_val','Acov_val','Apar_val','rep_val','dest_w_val',...
     'tag_l','ener_l','role_l','tag_d','ener_d','role_d',...
     'Atag_l','Aener_l','Arole_l','Atag_d','Aener_d','Arole_d',...
-    'Dtag_l','Dener_l','Drole_l','Dtag_d','Dener_d','Drole_d','cov_ind');
+    'Dtag_l','Dener_l','Drole_l','Dtag_d','Dener_d','Drole_d','cov_ind', 'prt', 'mean_energy');
 % prompt = 'Enter the time of evaluation: ';
 % time = input(prompt);
 % save(file1,'time','-append');
