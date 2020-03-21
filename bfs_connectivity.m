@@ -11,12 +11,15 @@ if isempty(nodes)
     return 
 end
 vis = [];
+level = [];
 for i = 1:200
     vis = [vis 0];
+    level = [level 0];
     Node(i).npar = 0;
 end
 for i = 1:size(nodes, 2)
     vis(nodes(i)) = 1;
+    level(nodes(i)) = 1;
     Node(nodes(i)).lvl = 1;
 end
 % coutNeigh = nodes
@@ -42,6 +45,9 @@ while ind <= size(nodes, 2)
     end
     ind = ind + 1;
 end
+for i = 1:size(nodes, 2)
+    level(nodes(i)) = Node(nodes(i)).lvl;
+end
 % tt = nodes
 % pause;
 % for i = 1:k
@@ -53,7 +59,7 @@ for i = size(nodes, 2):-1:1
     Node(cur).lvl = 1;
     for cc = 1:size(Node(cur).neighbor, 2)
         go = Node(cur).neighbor(cc);
-        if vis(go) == 1 && Node(go).lvl == Node(cur).lvl + 1
+        if vis(go) == 1 && level(go) == level(cur) + 1
             Node(cur).lvl = Node(cur).lvl + (Node(go).lvl / Node(go).npar);
         end
     end
