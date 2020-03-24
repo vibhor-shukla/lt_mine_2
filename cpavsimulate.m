@@ -13,14 +13,14 @@ while mode_c~=1&&mode_c~=0 %checking waid entry
     mode_c = input('Enter the  mode: 1->CG; 0->TG: ');
 end
 %file1 = 'Random_destroy_5.mat';
-Total_dep_side=7; % define three sides w1,r,w2
+Total_dep_side=1; % define three sides w1,r,w2
 E_max=5; %maximum energy of a fresh node.in volts
 % change made to threshold and die energies should also be done in Energy_fun().
 E_threshold = 2.5; % Minimum energy after which node cann't be relay(volts)
 E_die = 1.8; % Energy after which node cannnot work(volts).
 Status = [1;0]; % live and dead.%Status = ['L';'D'];
 Role = ['S';'R';'B';'E']; % sensor or relay or both and emergency
-Length_interest = 1000; %deployment lenght of galary
+Length_interest = 2000; %deployment lenght of galary
 Start_length = 100;
 global Rcom
 Rcom = 40; % communication range of sensor
@@ -39,7 +39,7 @@ Node = struct('tag',tag,'energy',E_max,'neighbor',[],'status',Status(2),'role',R
 Sink_neighbor =[];
 %% DEPLOY and obtain deployment parameters as output
 
-[number_node,X,Y,Z,each_side,sink]=Deploy(Length_interest,Rcom);
+[number_node,X,Y,Z,each_side,sink]=averageDeploy(Length_interest,Rcom);
 % Output: total nodes deployed, their coordinates,number of node in each
 % side and Location of sink
 
@@ -459,12 +459,12 @@ for l=1:iteration
     
 end
 if Length_interest == 2000
-    writematrix(prt, '/home/vajrang/Downloads/sem8/final_year_project/code/send/500/live_nodes/robust.csv');
-    writematrix(mean_energy, '/home/vajrang/Downloads/sem8/final_year_project/code/send/500/energy/robust.csv');
+    writematrix(prt, '/home/vajrang/Downloads/sem8/final_year_project/code/send/500/live_nodes/average.csv');
+    writematrix(mean_energy, '/home/vajrang/Downloads/sem8/final_year_project/code/send/500/energy/average.csv');
 end
 if Length_interest == 1000
-    writematrix(prt, '/home/vajrang/Downloads/sem8/final_year_project/code/send/250/live_nodes/robust.csv');
-    writematrix(mean_energy, '/home/vajrang/Downloads/sem8/final_year_project/code/send/250/energy/robust.csv');
+    writematrix(prt, '/home/vajrang/Downloads/sem8/final_year_project/code/send/250/live_nodes/average.csv');
+    writematrix(mean_energy, '/home/vajrang/Downloads/sem8/final_year_project/code/send/250/energy/average.csv');
 end
 
 %emergency = unique(emergency);

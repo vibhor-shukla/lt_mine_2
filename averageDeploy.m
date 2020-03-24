@@ -10,7 +10,7 @@ h3 = Height / 3;
 Width=5;   % width of tunnel.
 %x_int = 90*Rcom/100; % deployment distance of nodes in length.
 %x_int = sqrt(((0.8 * Rcom) ^ 2) - (Width * Width));
-x_int = 0.45 * Rcom;
+x_int = 0.45 * Rcom / 2;
 %% Deciding coordinates of nodes.
 % w1-> wall 1,  w2->wall 2, r->roof.
 

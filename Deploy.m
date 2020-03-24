@@ -96,16 +96,18 @@ Z_w22 = Z_w2;
 % end
 
 % storing all X,Y,Z indices of nodes
-X = {X_w1;X_r;X_w2};
-Y = {Y_w1;Y_r;Y_w2};
-Z = {Z_w1;Z_r;Z_w2};
+X = {X_w11; X_w12; X_w1; X_r;X_w2;X_w21;X_w22};
+Y = {Y_w11; Y_w12; Y_w1; Y_r;Y_w2;Y_w21;Y_w22};
+Z = {Z_w11; Z_w12; Z_w1; Z_r;Z_w2;Z_w21;Z_w22};
+
 
 % counting number of nodes deployed
 n_w1 = size(X_w1,2);
 n_w2 = size(X_w2,2);
 n_r = size(X_r,2);
-Total_node = n_w1+n_w2 + n_r;
-each_side = [n_w1,n_w2, n_r];
+n_t = size(X_w11, 2) + size(X_w12, 2) + size(X_w21, 2) + size(X_w22, 2);
+Total_node = n_w1+n_w2 + n_r + n_t;
+each_side = [n_w1,n_w1,n_w1,n_w1,n_w1,n_w2, n_r];
 
 % initializing node degrees to zeros.
 deg_w1=zeros([1 n_w1]); 
