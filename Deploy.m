@@ -42,7 +42,6 @@ end
 % s2
 % s3
 % length_interest
-size(X_w1, 2) + size(X_r, 2) + size(X_w2, 2)
 %size(X_w1, 2) + size(X_w2, 2)
 
 % prompt_del = 'Enter the file name to store data: ';
@@ -105,7 +104,7 @@ Z = {Z_w1;Z_r;Z_w2};
 n_w1 = size(X_w1,2);
 n_w2 = size(X_w2,2);
 n_r = size(X_r,2);
-Total_node = n_w1+n_w2;
+Total_node = n_w1+n_w2 + n_r;
 each_side = [n_w1,n_w2, n_r];
 
 % initializing node degrees to zeros.

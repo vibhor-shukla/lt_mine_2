@@ -13,9 +13,13 @@ end
 
 % For all possible power set of live nodes being as cover.
 %for i = 1:(2^n-1);
- i = (2^n - 1); 
+%  i = (2^n - 1); 
     % decimal to binary
-    pos_cov = de2bi(i,n); %LSB-MSB
+%     pos_cov = de2bi(i,n); %LSB-MSB
+    pos_cov = [];
+    for i = 1:n
+        pos_cov = [pos_cov 1];
+    end
     %pos_cov
     %pos_cov = int_bin(i,n); MSB-LSB
     pos_cov = logical(pos_cov);

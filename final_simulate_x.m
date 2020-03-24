@@ -23,8 +23,7 @@ Length_interest = 500; %deployment lenght of galary
 Start_length = 100;
 global Rcom
 Rcom = 40; % communication range of sensor
-
-max_node = 1000; % maximum nodes for simulations
+max_node = 100; % maximum nodes for simulations
 % Storing tag values in size
 tag(1:max_node) = {0};
 for i=1:max_node
@@ -35,7 +34,7 @@ Pos = {'wall_1','roof', 'wall_2'};
 Exist = [1;0];
 Mode = [1,2]; % Active->1  Sleep->2
 global Node
-Node = struct('tag',tag,'energy',E_max,'neighbor',[],'status',Status(2),'role',Role(1),'loc',[],'pos',[],'exist',Exist(2),'mode',Mode(1), 'lvl', -1, 'npar', -1);
+Node = struct('tag',tag,'energy',E_max,'neighbor',[],'status',Status(2),'role',Role(1),'loc',[],'pos',[],'exist',Exist(2),'mode',Mode(1), 'lvl', -1, 'npar', -1, 'rec', -1, 'trans', -1);
 Sink_neighbor =[];
 %% DEPLOY and obtain deployment parameters as output
 
@@ -46,7 +45,6 @@ Sink_neighbor =[];
 
 sides = 1; % iterator for w1,r,w2 -> 1,2,3.
 %size = [n_w1,n_r,n_w2]; % array of total number of
-global k
 k=1; % Deployed node access loop variable
 % for all sides
 while sides<=Total_dep_side
@@ -66,8 +64,7 @@ while sides<=Total_dep_side
 end
 
 each_count = each_side(1);
-number_node = number_node
-pause;
+
 % finding neighbors for each node. Exclude those on same side
 for i=1:number_node
     for j= 1:number_node
@@ -78,10 +75,6 @@ for i=1:number_node
             Node(i).neighbor = [Node(i).neighbor, Node(j).tag];
         end
     end
-%     if i == 42
-%         fprintf('@ %d ', Node(i).neighbor);
-%         pause;
-%     end
     Node(i).status=Status(1); % assign deployed node as alive
     %disp(Node(i).tag);disp(Node(i).pos);
     
@@ -118,14 +111,6 @@ live = find([Node(:).status]&[Node(:).exist]==1)
 [in_range, mx_lvl] = bfs_connectivity(live, Sink_neighbor, each_side);
 
 mx_lvl
-out = 1:k
-ener = [];
-% for i = 1:k-1
-%     ener = [ener Node(i).energy];
-% %     pause;
-% end
-% ener = ener
-% pause;
 % pause;
 
 iteration = 2500;
@@ -432,8 +417,6 @@ for l=1:iteration
     end
     prt = [prt;l size(live, 2)];
     [cmean] = MeanEnergy(k);
-    cmean
-%     pause;
     mean_energy = [mean_energy; l cmean];
 end
 

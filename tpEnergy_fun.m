@@ -65,7 +65,7 @@ else
              Node(node_tag(i)).status=0;
         else
 %              Node(node_tag(i)).energy = Node(node_tag(i)).energy-S_fxd-R_fxd;
-            Node(node_tag(i)).energy = Node(node_tag(i)).energy-S_fxd - (reduce * Node(node_tag(i)).lvl);
+            Node(node_tag(i)).energy = Node(node_tag(i)).energy-S_fxd - (reduce * (Node(node_tag(i)).rec + Node(node_tag(i)).trans));
             if (Node(node_tag(i)).energy<=E_die) % condition for dead node
                 Node(node_tag(i)).status=0;
             end
