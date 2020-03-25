@@ -109,7 +109,7 @@ live = find([Node(:).status]&[Node(:).exist]==1)
 [in_range, mx_lvl] = bfs_connectivity(live, Sink_neighbor, each_side);
 
 iteration = 2500;
-prob_d = 0.006; % probability for random destroy
+prob_d = 0.0006; % probability for random destroy
 prob_a = 0.3; % probability for random additon
 prob_rp = 0.15; % probability for random repair
 prob_w = .95;   % probability for wall destroy

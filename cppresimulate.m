@@ -1,4 +1,4 @@
-%% VARIBLE DEFINITIONtS
+%% VARIBLE DEFINITIONS
 % check also for loop_count in addition & repair phase
 % check for allowing connectivity among same side as well (overcome spare connectivity loss)
 % ** update of simulate and connected is required
@@ -8,8 +8,9 @@ clear
 prompt = 'Enter the file name to store data: ';
 file1 = input(prompt,'s');
 mode_c = input('Enter the  mode: 1->CG; 0->TG: ');
-while numel(mode_c)==0||mode_c~=1&&mode_c~=0 %checking waid entry
-    mode_c = input('Entry not valid! Re-enter the mode:\nEnter the  mode: 1->CG; 0->TG: ');
+while mode_c~=1&&mode_c~=0 %checking waid entry
+    disp('Entry not valid! Re-enter the mode:');
+    mode_c = input('Enter the  mode: 1->CG; 0->TG: ');
 end
 %file1 = 'Random_destroy_5.mat';
 Total_dep_side=3; % define three sides w1,r,w2
@@ -19,34 +20,34 @@ E_threshold = 2.5; % Minimum energy after which node cann't be relay(volts)
 E_die = 1.8; % Energy after which node cannnot work(volts).
 Status = [1;0]; % live and dead.%Status = ['L';'D'];
 Role = ['S';'R';'B';'E']; % sensor or relay or both and emergency
-Length_interest = 2000; %deployment lenght of galary
+Length_interest = 1000; %deployment lenght of galary
 Start_length = 100;
 global Rcom
 Rcom = 40; % communication range of sensor
-max_node = 500; % maximum nodes for simulations
+max_node = 300; % maximum nodes for simulations
 % Storing tag values in size
 tag(1:max_node) = {0};
 for i=1:max_node
     tag(i) = {max_node+1-i};
 end
 tag=rot90(tag); %anticlock wise
-Pos = {'wall_1','roof', 'wall_2'};
+Pos = {'wall_1','roof','wall_2', '1', '2', '3', '4'};
 Exist = [1;0];
 Mode = [1,2]; % Active->1  Sleep->2
 global Node
-Node = struct('tag',tag,'energy',E_max,'neighbor',[],'status',Status(2),'role',Role(1),'loc',[],'pos',[],'exist',Exist(2),'mode',Mode(1), 'lvl', -1, 'npar', -1);
+Node = struct('tag',tag,'energy',E_max,'neighbor',[],'status',Status(2),'role',Role(1),'loc',[],'pos',[],'exist',Exist(2),'mode',Mode(1), 'lvl', -1);
 Sink_neighbor =[];
 %% DEPLOY and obtain deployment parameters as output
 
-[number_node,X,Y,Z,each_side,sink]= pre_deploy(Length_interest,Rcom);
-% Output: total nodes deployed, their coordinates and number of node in each side.
+[number_node,X,Y,Z,each_side,sink]=pre_deploy(Length_interest,Rcom);
+% Output: total nodes deployed, their coordinates,number of node in each
+% side and Location of sink
 
-%% Node Parameters assitpEnergy_fun(1, each_count, mx_lvl);gnment
+%% Node Parameters assignment
 
 sides = 1; % iterator for w1,r,w2 -> 1,2,3.
 %size = [n_w1,n_r,n_w2]; % array of total number of
-global k; % Deployed node access loop variable
-k = 1;
+k=1; % Deployed node access loop variable
 % for all sides
 while sides<=Total_dep_side
     % Assigning location coordinates and position of all node to respective
@@ -65,7 +66,6 @@ while sides<=Total_dep_side
 end
 
 each_count = each_side(1);
-
 % finding neighbors for each node. Exclude those on same side
 for i=1:number_node
     for j= 1:number_node
@@ -99,29 +99,21 @@ end
 % opt_cover-> optimal cover and its access index in Total_cover.
 
 %% Simulation Parameters
+
 temp(1:max_node) = {0};
 [Node.exist] = temp{:};% reassigning value for simulation
 [Node.status] = temp{:};% reassigning value for simulation
-%Addition(Length_interest,0,Start_length); %initializing deployment
 Addition(Length_interest,0,Length_interest); %initializing deployment
 
-% p1 = size(find([Node(:).status]&[Node(:).exist]==1), 2)
-% p2 = find([Node(:).status])
-% pause;
 live = find([Node(:).status]&[Node(:).exist]==1)
 [in_range, mx_lvl] = bfs_connectivity(live, Sink_neighbor, each_side);
 
-mx_lvl
-
-% pause;
-
-
 iteration = 2500;
-prob_d = 0.02; % probability for random destroy
+prob_d = 0.006; % probability for random destroy
 prob_a = 0.3; % probability for random additon
 prob_rp = 0.15; % probability for random repair
 prob_w = .95;   % probability for wall destroy
-percentage=40; % percentage of node destruction
+percentage=0; % percentage of node destruction
 add_threshold = 3; % minimum number of live node for addition
 current = Start_length; %current working length
 add_len = 20; %length for itterative addition
@@ -145,7 +137,9 @@ Dpar_it=[]; % parameter calculated when destroy
 Apar_it=[]; % parameter calculated when add
 rep_it=[]; % repair called
 dest_w_it=[]; % Destroy_wall called
-% cov index
+% index of cov
+Dcov_ind = [];
+Acov_ind = [];
 cov_ind = [];
 % value storage variables
 dest_w_val=[]; %destroyed side
@@ -185,99 +179,142 @@ rng('shuffle');
 flag=0;
 prt = [];
 mean_energy = [];
-maxl = [];
 for l=1:iteration
+    % break condition has to be checked 21/4/2019 !!Checked-5/1/2019
     check = 0;
     m_in = 0;
     l
-    mx_lvl
-%     pause;
-%     %% Without cover        
-%     live = find([Node(:).status]&[Node(:).exist]==1);
-%     temp_r(1:length(live)) = {'B'};
-%     [Node(live).role]= temp_r{:};
-%     tag_l{end+1} = [Node(live).tag];
-%      if isempty(live)
-%          break;
-%      end
+    live = find([Node(:).status]&[Node(:).exist]==1);
+    if isempty(intersect(Sink_neighbor,live)) || (numel(live)==1 && dist([Node(live).loc(1),sink(1)],[Node(live).loc(2),sink(2)],[Node(live).loc(3),sink(3)]) > Rcom)
+       break; 
+    end
+    %% Inititalizing
+    prt = [prt;l size(live, 2)];
+    [cmean] = MeanEnergy(k);
+    mean_energy = [mean_energy; l cmean];
+    if l==1
+%         Energy_fun(1); % for health check state
+        tpEnergy_fun(0, each_count, mx_lvl);
+        live = find([Node(:).status]&[Node(:).exist]==1);
+        dead = find(((~[Node(:).status])&[Node(:).exist])==1);
+        %         [Total_cover,load] = cover(live);
+        [Total_cover,load] = cover(live,Sink_neighbor,mode_c); %change Optimal_cov if this step is not used.
+        [opt_cover,index,parameter] = Optimal_cov(Total_cover,load,mode_c);
+        if isempty(opt_cover) %when no cover found
+            if(~isempty(live)) %Emergency stage
+                emer = [emer l];
+                temp_r(1:length(live)) = {'E'};
+                [Node(live).role]= temp_r{:};
+            end
+        else
+            %  storing optimal cover and cost of all cover in total cover
+            cov_val{end+1} = opt_cover;
+            cov_ind = [cov_ind index];
+            par_val{end+1} = parameter;
+            cov_it = [cov_it l]; % store iteration number when optimal_cov called
+            % changing roles
+            if (length(opt_cover) == length(live) && nnz(opt_cover==live)==length(opt_cover))
+                temp_r(1:length(opt_cover)) = {'B'};
+                [Node(opt_cover).role]= temp_r{:};
+            else
+                temp_r(1:length(opt_cover)) = {'R'};
+                [Node(opt_cover).role]= temp_r{:};
+                s = setdiff(live,opt_cover);
+                temp_r(1:length(s)) = {'S'};
+                [Node(s).role]= temp_r{:};
+            end
+        end
+        par_it= [par_it l];% store iteration number when parameters evaluated
+        % storing tag,energy,role of live and dead nodes
+        tag_l{end+1} = [Node(live).tag];
+        ener_l{end+1} = [Node(live).energy];
+        role_l{end+1} = [Node(live).role];
+        tag_d{end+1} = [Node(dead).tag];
+        ener_d{end+1} = [Node(dead).energy];
+        role_d{end+1} = [Node(dead).role];
+        % flag =1; %resetting the flag after periodic check is done
+    end
     
     %% Node level
+    [in_range, mx_lvl] = bfs_connectivity(live, Sink_neighbor, each_side);
     tpEnergy_fun(0, each_count, mx_lvl); % normal energy depletion
     
-
     %Normal Destroy
-%     r = rand(1,1); %random number generate
-%     if r<=prob_d
-%         T = Destroy(percentage); % decision for distroying
-%         if(~isempty(T))
-%             dest_val{end+1} = T; %Storing the destroyed nodes
-%             check =1;
-%             dest_it = [dest_it l]; % store iteration number when destroy called
-%             T_role = [Node(T).role];
-%             if ~all(T_role=='S')%any(T_role=='R') || any(T_role=='B')  || any(T_role=='E')
-%                 flag=1; % when any relay node is destroyed or not connected network
-%             else
-%                 flag=0;
-%             end
-%         end
-%     end
-%     
-%     %     % Wall/roof destroy
-%     %     r3 = rand(1,1);
-%     %     if r3>=prob_w
-%     %         w = randi(3,1); %1->wall_1 2->roof 3->wall_2
-%     %         Destroy_wall(w);
-%     %         dest_w_val =[dest_w_val w];
-%     %         dest_w_it =[dest_w_it l]; %storing the
-%     %         check =1;
-%     %     end
-%     
-%     %% Sink level
-%     
-%     % new cover decision when network destruction and a relay is dead
-%     if check==1 && flag==1% && mod(l,data_count)==0
-%         Energy_fun(1); % for health check state
-%         live = find([Node(:).status]&[Node(:).exist]==1);
-%         dead = find(((~[Node(:).status])&[Node(:).exist])==1);
-%         %         [Total_cover,load] = cover(live);
-%         [Total_cover,load] = cover(live,Sink_neighbor,mode_c); %change Optimal_cov if this step is not used.
-%         [opt_cover,index,parameter] = Optimal_cov(Total_cover,load,mode_c);
-%         if isempty(opt_cover) %when no cover found
-%             if(~isempty(live)) %Emergency stage
-%                 Demer = [Demer l];
-%                 temp_r(1:length(live)) = {'E'};
-%                 [Node(live).role]= temp_r{:};
-%             end
-%         else
-%             %  storing optimal cover and cost of all cover in total cover
-%             Dcov_val{end+1} = opt_cover;
-%             Dpar_val{end+1} = parameter;
-%             Dcov_it = [Dcov_it l]; % store iteration number when optimal_cov called
-%             % changing roles
-%             if (length(opt_cover) == length(live) && nnz(opt_cover==live)==length(opt_cover))
-%                 temp_r(1:length(opt_cover)) = {'B'};
-%                 [Node(opt_cover).role]= temp_r{:};
-%             else
-%                 temp_r(1:length(opt_cover)) = {'R'};
-%                 [Node(opt_cover).role]= temp_r{:};
-%                 s = setdiff(live,opt_cover);
-%                 temp_r(1:length(s)) = {'S'};
-%                 [Node(s).role]= temp_r{:};
-%             end
-%         end
-%         %Parameter measurement when node send data or distroy called
-%         Dpar_it= [Dpar_it l];% store iteration number when parameters evaluated
-%         % storing tag,energy,role of live and dead nodes
-%         Dtag_l{end+1} = [Node(live).tag];
-%         Dener_l{end+1} = [Node(live).energy];
-%         Drole_l{end+1} = [Node(live).role];
-%         Dtag_d{end+1} = [Node(dead).tag];
-%         Dener_d{end+1} = [Node(dead).energy];
-%         Drole_d{end+1} = [Node(dead).role];
-%         %flag=0; % resetting the flag
-%     end
-%     
-
+    r = rand(1,1); %random number generate
+    if r<=prob_d
+        T = Destroy(percentage); % decision for distroying
+        if(~isempty(T))
+            fprintf('some nodes have been destroyed %d\n', T);
+%             pause;
+            dest_val{end+1} = T; %Storing the destroyed nodes
+            check =1;
+            dest_it = [dest_it l]; % store iteration number when destroy called
+            T_role = [Node(T).role];
+            if ~all(T_role=='S')%any(T_role=='R') || any(T_role=='B')  || any(T_role=='E')
+                flag=1; % when any relay node is destroyed or not connected network
+            else
+                flag=0;
+            end
+        end
+    end
+    
+    %     % Wall/roof destroy
+    %     r3 = rand(1,1);
+    %     if r3>=prob_w
+    %         w = randi(3,1); %1->wall_1 2->roof 3->wall_2
+    %         Destroy_wall(w);
+    %         dest_w_val =[dest_w_val w];
+    %         dest_w_it =[dest_w_it l]; %storing the
+    %         check =1;
+    %     end
+    
+    %% Sink level
+    
+    % new cover decision when network destruction and a relay is dead
+    if check==1 && flag==1% && mod(l,data_count)==0
+        [in_range, mx_lvl] = bfs_connectivity(live, Sink_neighbor, each_side);
+        tpEnergy_fun(1, each_count, mx_lvl); % for health check state
+        live = find([Node(:).status]&[Node(:).exist]==1);
+        dead = find(((~[Node(:).status])&[Node(:).exist])==1);
+        %         [Total_cover,load] = cover(live);
+        [Total_cover,load] = cover(live,Sink_neighbor,mode_c); %change Optimal_cov if this step is not used.
+        [opt_cover,index,parameter] = Optimal_cov(Total_cover,load,mode_c);
+        if isempty(opt_cover) %when no cover found
+            if(~isempty(live)) %Emergency stage
+                Demer = [Demer l];
+                temp_r(1:length(live)) = {'E'};
+                [Node(live).role]= temp_r{:};
+            end
+        else
+            %  storing optimal cover and cost of all cover in total cover
+            Dcov_val{end+1} = opt_cover;
+            Dcov_ind = [Dcov_ind index];
+            Dpar_val{end+1} = parameter;
+            Dcov_it = [Dcov_it l]; % store iteration number when optimal_cov called
+            % changing roles
+            if (length(opt_cover) == length(live) && nnz(opt_cover==live)==length(opt_cover))
+                temp_r(1:length(opt_cover)) = {'B'};
+                [Node(opt_cover).role]= temp_r{:};
+            else
+                temp_r(1:length(opt_cover)) = {'R'};
+                [Node(opt_cover).role]= temp_r{:};
+                s = setdiff(live,opt_cover);
+                temp_r(1:length(s)) = {'S'};
+                [Node(s).role]= temp_r{:};
+            end
+        end
+        %Parameter measurement when node send data or distroy called
+        Dpar_it= [Dpar_it l];% store iteration number when parameters evaluated
+        % storing tag,energy,role of live and dead nodes
+        Dtag_l{end+1} = [Node(live).tag];
+        Dener_l{end+1} = [Node(live).energy];
+        Drole_l{end+1} = [Node(live).role];
+        Dtag_d{end+1} = [Node(dead).tag];
+        Dener_d{end+1} = [Node(dead).energy];
+        Drole_d{end+1} = [Node(dead).role];
+        %flag=0; % resetting the flag
+    end
+    
 %     %% addition of nodes
 %     %  rng('shuffle');
 %     r1=rand(1,1); %random number generate
@@ -311,7 +348,7 @@ for l=1:iteration
 %                     temp_r(1:length(live)) = {'E'};
 %                     [Node(live).role]= temp_r{:};
 %                     %Emergency call when numel(live)<add_threshold
-%                 elseif isempty(live)
+%                 elseif isempty(live)&&check~=2
 %                     break; % all node dead -> out of loop  iteration
 %                 end
 %             end
@@ -320,7 +357,8 @@ for l=1:iteration
 %     
 %     % new cover decision when there is  network addition or repair
 %     if check==3||check==2
-%         Energy_fun(1); % for health check state
+%         [in_range, mx_lvl] = bfs_connectivity(live, Sink_neighbor, each_side);
+%         tpEnergy_fun(1, each_count, mx_lvl); % for health check state
 %         live = find([Node(:).status]&[Node(:).exist]==1);
 %         dead = find(((~[Node(:).status])&[Node(:).exist])==1);
 %         %         [Total_cover,load] = cover(live);
@@ -335,6 +373,7 @@ for l=1:iteration
 %         else
 %             %  storing optimal cover and cost of all cover in total cover
 %             Acov_val{end+1} = opt_cover;
+%             Acov_ind = [Acov_ind index];
 %             Apar_val{end+1} = parameter;
 %             Acov_it = [Acov_it l]; % store iteration number when optimal_cov called
 %             % changing roles
@@ -360,18 +399,16 @@ for l=1:iteration
 %         Aener_d{end+1} = [Node(dead).energy];
 %         Arole_d{end+1} = [Node(dead).role];
 %     end
-%     
-    %% Periodic Cover Evaluate
-   % periodic only when any relay was dead earlier and no update due to addition
-    num_live = find([Node(:).status]&[Node(:).exist]==1);
-    if (l==1)||mod(l,data_count)==0 % && (check==0 || flag==0) %&& mod(l,loop_count)==0
+    
+    %% Perioic Cover Evaluate
+    % periodic only when any relay was dead earlier and no update due to addition
+    if mod(l,data_count)==0 && (check==0 || flag==0) %&& mod(l,loop_count)==0
         [in_range, mx_lvl] = bfs_connectivity(live, Sink_neighbor, each_side);
-        fprintf('call');
         tpEnergy_fun(1, each_count, mx_lvl); % for health check state
         live = find([Node(:).status]&[Node(:).exist]==1);
         dead = find(((~[Node(:).status])&[Node(:).exist])==1);
         %         [Total_cover,load] = cover(live);
-        [Total_cover,load] = cover(l, live,Sink_neighbor,mode_c); %change Optimal_cov if this step is not used.
+        [Total_cover,load] = cover(live,Sink_neighbor,mode_c); %change Optimal_cov if this step is not used.
         [opt_cover,index,parameter] = Optimal_cov(Total_cover,load,mode_c);
         if isempty(opt_cover) %when no cover found
             if(~isempty(live)) %Emergency stage
@@ -380,7 +417,7 @@ for l=1:iteration
                 [Node(live).role]= temp_r{:};
             end
         else
-            %storing optimal cover and cost of all cover in total cover
+            %  storing optimal cover and cost of all cover in total cover
             cov_val{end+1} = opt_cover;
             cov_ind = [cov_ind index];
             par_val{end+1} = parameter;
@@ -397,15 +434,15 @@ for l=1:iteration
                 [Node(s).role]= temp_r{:};
             end
         end
-                % not calculating parameter here because loop_count is multiple of
-                % data_count.
-    flag =1; %resettig the flag after periodic check is done
-    end
-        
-    if (check==0 || flag==0) && mod(l,data_count)==0
-        %parameter calculate periodically
-        live = find([Node(:).status]&[Node(:).exist]==1);
-        dead = find(((~[Node(:).status])&[Node(:).exist])==1);
+        %         % not calculating parameter here because loop_count is multiple of
+        %         % data_count.
+        % flag =1; %resettig the flag after periodic check is done
+        %     end
+        %
+        %     if (check==0 || flag==0) && mod(l,data_count)==0
+        % parameter calculate periodically
+        %         live = find([Node(:).status]&[Node(:).exist]==1);
+        %         dead = find(((~[Node(:).status])&[Node(:).exist])==1);
         par_it= [par_it l];% store iteration number when parameters evaluated
         % storing tag,energy,role of live and dead nodes
         tag_l{end+1} = [Node(live).tag];
@@ -415,16 +452,11 @@ for l=1:iteration
         ener_d{end+1} = [Node(dead).energy];
         role_d{end+1} = [Node(dead).role];
         flag =1; %resetting the flag after periodic check is done
-        
         if isempty(live)
-            break;
+            break; % out of loop because no 
         end
-        
     end
-    prt = [prt;l size(live, 2)];
-    [cmean] = MeanEnergy(k);
-    mean_energy = [mean_energy; l cmean];
-    maxl = [maxl; l mx_lvl];
+    
 end
 if Length_interest == 2000
     writematrix(prt, '/home/vajrang/Downloads/sem8/final_year_project/code/send/500/live_nodes/pre.csv');
@@ -434,6 +466,7 @@ if Length_interest == 1000
     writematrix(prt, '/home/vajrang/Downloads/sem8/final_year_project/code/send/250/live_nodes/pre.csv');
     writematrix(mean_energy, '/home/vajrang/Downloads/sem8/final_year_project/code/send/250/energy/pre.csv');
 end
+
 %emergency = unique(emergency);
 %% storing value with destruction
 % rename file each time simulating accordingly
@@ -444,7 +477,8 @@ save(file1,'Opt_cover','Index','Parameter','Total_Cover','Load','sink','data_cou
     'dest_val','cov_val','par_val','Dcov_val','Dpar_val','Acov_val','Apar_val','rep_val','dest_w_val',...
     'tag_l','ener_l','role_l','tag_d','ener_d','role_d',...
     'Atag_l','Aener_l','Arole_l','Atag_d','Aener_d','Arole_d',...
-    'Dtag_l','Dener_l','Drole_l','Dtag_d','Dener_d','Drole_d','cov_ind', 'prt', 'mean_energy');
+    'Dtag_l','Dener_l','Drole_l','Dtag_d','Dener_d','Drole_d',...
+    'Acov_ind','Dcov_ind','cov_ind');
 % prompt = 'Enter the time of evaluation: ';
 % time = input(prompt);
 % save(file1,'time','-append');
