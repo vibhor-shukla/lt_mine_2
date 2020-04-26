@@ -31,3 +31,12 @@ Checks whether the live nodes are connected or not
 #### _Destroy.m_ :
 Input is the percentage of live nodes to be destroyed\
 Changes the status from live to dead of certain percentage
+
+#### _cpavsimulate.m_ :
+Simulates for Average Deployment
+
+#### _cpsimulate.m_ : 
+Simulates for Second Deployment
+
+#### _cptlayeredsimulate.m_ :
+Simulates for Layered Deployment
